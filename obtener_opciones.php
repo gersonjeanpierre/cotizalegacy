@@ -1,5 +1,5 @@
 <?php
-include 'conexion.php';
+require __DIR__ . "/conexion.php";
 $conn = Cconexion::ConexionBD();
 
 // Verificar si se recibió el ID del producto
@@ -32,6 +32,7 @@ function obtenerOpcionesAdicionales($id_producto, $tipo_cliente) {
     global $conn;
     $opciones = [];
     $precios = [];
+    $t_cliente = getTipoClienteBaseDatos($tipo_cliente);
     
     // Consulta para obtener las opciones y sus precios
     $sql = "SELECT oe.id_opcion, oe.descripcion, oe.precio_opcion 
@@ -90,7 +91,11 @@ function obtenerOpcionesAdicionales($id_producto, $tipo_cliente) {
         }
     }
     
-    return ['opciones' => $opciones, 'precios' => $precios];
+      return [
+        'opciones' => $opciones,
+        'precios' => $precios,
+        'tipo_cliente' => $t_cliente // <-- Se agrega aquí
+    ];
 }
 
 // Obtener opciones y precios
