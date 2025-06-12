@@ -306,6 +306,102 @@ function calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, 
     return $precio_base * $cantidad;
 }
 
+function calcularPrecioCeltexFoam(
+    $largoVinilMetros,
+    $anchoVinilMetros,
+    $precioBasePlancha,
+    // $margenSeguridadPorcentaje = 10
+) {
+    $largoPlancha = 2.4; // metros
+    $anchoPlancha = 1.2; // metros
+    $costoFinal = 0;
+    $areaTotalPlancha = $largoPlancha * $anchoPlancha; // m²
+    echo "Área total de la plancha: " . number_format($areaTotalPlancha, 2) . " m²" . PHP_EOL;
+
+    if ($areaTotalPlancha == 0) {
+        return 0; // Evitar división por cero
+    };
+    if ($anchoVinilMetros > 1.5) {
+        echo "El ancho del vinil es como maximo 1.5m." . PHP_EOL;
+        return 0;
+    }
+
+
+
+    // Menor iguala 1,2 metros el metro lineal
+    if ($anchoVinilMetros <= $anchoPlancha) {
+        if ($anchoVinilMetros <= 0.6) {
+            if ($largoVinilMetros > 1.2 && $largoVinilMetros <= 2.4) {
+                $costoFinal = $precioBasePlancha / 2;
+                echo "El costo es 1.2 24: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+                return $costoFinal;
+            } else if ($largoVinilMetros > 2.4 && $largoVinilMetros <= 4.8) {
+                $costoFinal = $precioBasePlancha;
+                echo "El costo es 2.4 48: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+                return $costoFinal;
+            }
+        }
+        if ($largoVinilMetros <= 1.2 && ($anchoVinilMetros > 0 && $anchoVinilMetros <= 1.2)) {
+            $costoFinal = $precioBasePlancha / 2;
+            echo "El costo es 1.2 12:" . number_format($precioBasePlancha / 2, 2) . " soles" . PHP_EOL;
+            return $costoFinal;
+        };
+        if ($anchoVinilMetros > 0.6 && $anchoVinilMetros <= 1.2) {
+            if ($largoVinilMetros > 1.2 && $largoVinilMetros <= 2.4) {
+                $costoFinal = $precioBasePlancha;
+                echo "El costo es 06 1.2 : " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+                return $costoFinal;
+            } else if ($largoVinilMetros > 2.4 && $largoVinilMetros <= 4.8) {
+                $costoFinal = $precioBasePlancha * 2;
+                echo "El costo es 06 2.4: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+                return $costoFinal;
+            }
+        }
+    }
+
+    if ($anchoVinilMetros > $anchoPlancha && $anchoVinilMetros <= 1.5) {
+
+
+        if ($largoVinilMetros <= 1.2) {
+            $costoFinal = $precioBasePlancha * 0.625;
+            echo "El costo es 1.2 12 0625: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+            return $costoFinal;
+        }
+
+        if ($largoVinilMetros > 1.2 && $largoVinilMetros <= 1.8) {
+            // $deltaX = $anchoVinilMetros - $anchoPlancha;
+            // $deltaY = $largoPlancha - $largoVinilMetros;
+            // $cantidadListones = $largoVinilMetros / $anchoPlancha;
+            // $cantidadListones = ceil($cantidadListones);
+            // echo "Cantidad de listones necesarios: " . $cantidadListones . PHP_EOL;
+
+            // $areaSobrante = (($deltaY - $cantidadListones * $deltaX) * $anchoPlancha);
+            // $areaSobrante = round($areaSobrante, 4);
+
+            // echo "Area sobrante:" . ($areaSobrante) . PHP_EOL;
+            // echo "Medidas sobrantes de la plancha Celtex: " . round($deltaY - $cantidadListones * $deltaX, 4) . " x " . 1.2 . " m" . PHP_EOL;
+            $costoFinal = $precioBasePlancha;
+            echo "El costo es 1.2 18: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+            return $costoFinal;
+        } elseif ($largoVinilMetros > 1.8 && $largoVinilMetros <= 2.7) {
+            $costoFinal = $precioBasePlancha * 1.5;
+            echo "El costo es 1.2 27: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+            return $costoFinal;
+        } elseif ($largoVinilMetros > 2.7 && $largoVinilMetros <= 3) {
+            $costoFinal = $precioBasePlancha * 1.75;
+            echo "El costo es 1.2 30: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+            return $costoFinal;
+        } else if ($largoVinilMetros > 3 && $largoVinilMetros <= 3.6) {
+            $costoFinal = $precioBasePlancha * 2;
+            echo "El costo es 1.2 36: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
+            return $costoFinal;
+        }
+    };
+
+    echo "El ancho del vinil no es compatible con las medidas de la plancha Celtex." . PHP_EOL;
+    return $costoFinal;
+}
+
 // ************************************************************************************
 // Cargar datos
 $productos = obtenerProductos();
@@ -631,92 +727,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                     break;
                 // LAMINADO
 
-
-
-
-                // case '28': // Laminado
-                //     $tipo_opcion = isset($_POST["opcion-{$opcion_id}_tipo"]) ? $_POST["opcion-{$opcion_id}_tipo"] : 'No';
-                //     $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-
-                //     // Precios diferentes variando segun el tipo siendo brillo o mate 
-                //     if ($tipo_opcion == 'Brillo') {
-
-                //         $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                //     } elseif ($tipo_opcion == 'Mate') {
-
-                //         $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                //     }
-
-                //     $adicionales += $adicional_actual;
-                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                //     break;
-
-
-                // case '40':
-                //     $tipo_opcion = isset($_POST["opcion-{$opcion_id}_tipo"]) ? $_POST["opcion-{$opcion_id}_tipo"] : 'No';
-                //     $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-
-                //     // Precios diferentes variando segun el tipo siendo brillo o mate 
-                //     if ($tipo_opcion == 'Brillo') {
-
-                //         $adicional_actual = $metro_lineal * ($opcion_precio * 2) * $cantidad;
-                //     } elseif ($tipo_opcion == 'Mate') {
-
-                //         $adicional_actual = $metro_lineal * ($opcion_precio * 1.5) * $cantidad;
-                //     }
-
-                //     $adicionales += $adicional_actual;
-                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                //     break;
-
-                case '30': // Celtex
-                case '42':
-                    $tipo_opcion = isset($_POST["opcion-{$opcion_id}_tipo"]) ? $_POST["opcion-{$opcion_id}_tipo"] : 'No';
+                case '54': // Celtex
+                case '55':
+                case '56':
+                case '57':
                     $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-
-                    // Precios diferentes según el grosor seleccionado
-                    if ($tipo_opcion == 'c3') {
-                        // Precio para Celtex de 3mm
-                        $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    } elseif ($tipo_opcion == 'c5') {
-                        // Precio para Celtex de 5mm (podrías usar un multiplicador si el precio es diferente)
-                        $adicional_actual = $metro_lineal * ($opcion_precio * 1.5) * $cantidad;
-                    } else {
-                        $adicional_actual = 0;
-                    }
-                    
-                    //foot
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
-
-                // Para las opciones de Foamboard (id 31)
-                case '31': // Foamboard
-                case '43':
-                    $tipo_opcion = isset($_POST["opcion-{$opcion_id}_tipo"]) ? $_POST["opcion-{$opcion_id}_tipo"] : 'No';
+                case '58': // Celtex
+                case '59':
+                case '60':
+                case '61':
                     $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-
-                    // Precios diferentes según el grosor seleccionado
-                    if ($tipo_opcion == 'f3') {
-                        // Precio para Foamboard de 3mm
-                        $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    } elseif ($tipo_opcion == 'f5') {
-                        // Precio para Foamboard de 5mm (podrías usar un multiplicador si el precio es diferente)
-                        $adicional_actual = $metro_lineal * ($opcion_precio * 1.3) * $cantidad;
-                    } else {
-                        $adicional_actual = 0;
-                    }
-
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
-                case '44':
-                case '45':
+                case '62':
                     $ancho_plancha = isset($_POST["ancho_plancha_mop"]) ? floatval($_POST["ancho_plancha_mop"]) : 0;
                     $alto_plancha = isset($_POST["alto_plancha_mop"]) ? floatval($_POST["alto_plancha_mop"]) : 0;
+                    // Verifica si Celtex está seleccionado (id 54 o 61)
+                    $materialSeleccionado = false;
+                    $material_id = null;
+                    $material_ids = ['54', '55', '56', '57', '58', '59', '60', '61'];
+                    if (isset($_POST['opciones']) && is_array($_POST['opciones'])) {
+                        foreach ($_POST['opciones'] as $op) {
+                            if (in_array($op, $material_ids)) {
+                                $materialSeleccionado = true;
+                                $material_id = $op;
+                                break;
+                            }
+                        }
+                    }
 
-                    if ($ancho_plancha > 0 && $alto_plancha > 0) {
-                        $adicional_actual = calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
+
+                    if ($ancho_plancha > 0 && $alto_plancha > 0 && $materialSeleccionado) {
+                        $precioBaseMaterial = obtenerPrecioOpcion($material_id, $id_producto, $tipo_cliente);
+                        $adicional_actual = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
+                        $adicional_actual += calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
                         $adicionales += $adicional_actual;
                         $opciones_detalle[] = [
                             'id' => $opcion_id,
@@ -1095,18 +1139,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 if (cb !== checkbox) cb.checked = false;
             });
         }
-        function seleccionarUnicoCeltex(checkbox) {
+
+        function seleccionarUnicoCeltexFoam(checkbox) {
             // Desmarcar todos los del grupo excepto el actual
-            document.querySelectorAll('.celtex').forEach(cb => {
+            document.querySelectorAll('.celtexfoam').forEach(cb => {
                 if (cb !== checkbox) cb.checked = false;
             });
         }
-        function seleccionarUnicoFoam(checkbox) {
-            // Desmarcar todos los del grupo excepto el actual
-            document.querySelectorAll('.foam').forEach(cb => {
-                if (cb !== checkbox) cb.checked = false;
-            });
-        }
+
+        // function seleccionarUnicoFoam(checkbox) {
+        //     // Desmarcar todos los del grupo excepto el actual
+        //     document.querySelectorAll('.foam').forEach(cb => {
+        //         if (cb !== checkbox) cb.checked = false;
+        //     });
+        // }
 
 
 
@@ -1351,7 +1397,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                                     opcionHTML = `
                                 <div class="mb-3 option-item">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input celtex" id="opcion-${id}" name="opciones[]" value="${id}" onclick="seleccionarUnicoCeltex(this)">
+                                        <input type="checkbox" class="form-check-input celtexfoam" id="opcion-${id}" name="opciones[]" value="${id}" onclick="seleccionarUnicoCeltexFoam(this)">
                                         <label class="form-check-label" for="opcion-${id}">${descripcion}</label>
                                     </div>
                                 </div> `;
@@ -1364,11 +1410,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                                     opcionHTML = `
                                 <div class="mb-3 option-item">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input foam" id="opcion-${id}" name="opciones[]" value="${id}" onclick="seleccionarUnicoFoam(this)">
+                                        <input type="checkbox" class="form-check-input celtexfoam" id="opcion-${id}" name="opciones[]" value="${id}" onclick="seleccionarUnicoCeltexFoam(this)">
                                         <label class="form-check-label" for="opcion-${id}">${descripcion}</label>
                                     </div>
                                 </div> `;
                                 };
+                                if (id == 62 || id == 63) {
+                                    opcionesContainer.innerHTML += `<hr>`;
+
+                                    opcionHTML = `
+                                                <div class="mb-3 option-item">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input" id="opcion-${id}" 
+                                                            name="opciones[]" value="${id}" 
+                                                            onchange="toggleManoObraInput('opcion-${id}')">
+                                                        <label class="form-check-label" for="opcion-${id}">${descripcion}</label>
+                                                        <small class="form-text text-muted">Precio según área de plancha: ≥2.88m² = S/10, <1m² = S/5</small>
+                                                    </div>
+                                                    <div id="opcion-${id}_input_container" style="display:none; margin-top:10px;">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label for="ancho_plancha_mop" class="form-label">Ancho plancha (m):</label>
+                                                                <input type="number" id="ancho_plancha_mop" name="ancho_plancha_mop" 
+                                                                    class="form-control" step="0.01" min="0.01" max="1.5">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label for="alto_plancha_mop" class="form-label">Alto plancha (m):</label>
+                                                                <input type="number" id="alto_plancha_mop" name="alto_plancha_mop" 
+                                                                    class="form-control" step="0.01" min="0.01" max="2.5">
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <small class="text-info">Área calculada: <span id="area_plancha_display">0.00</span> m²</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `;
+                                }
                             }
 
                             opcionesContainer.innerHTML += opcionHTML;

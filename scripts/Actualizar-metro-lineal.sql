@@ -51,16 +51,8 @@ INSERT INTO OpcionExtra VALUES ('Foam 5mm',2,49,'final');
 INSERT INTO OpcionExtra VALUES ('Foam 3mm',2,34,'imprentero');
 INSERT INTO OpcionExtra VALUES ('Foam 5mm',2,49,'imprentero');
 
-
-
-
-
-
-
-
-
-
-
-
+-- Agregar mano de obra
+INSERT INTO OpcionExtra VALUES ('Mano de obra Pagado',2,null,'final');
+INSERT INTO OpcionExtra VALUES ('Mano de obra Pagado',2,null,'imprentero');
 
 
