@@ -1,8 +1,8 @@
-
-
 --- Actualizar el metro lineal a 40 de vinilo impresion
-UPDATE Precios SET precio_unitario=40 WHERE id_producto=2
+UPDATE Precios SET precio_unitario=40 WHERE id_precio = 37
 UPDATE Precios SET cantidad_min=1 WHERE id_precio = 37
+UPDATE Precios SET precio_unitario=35 WHERE id_precio = 38
+UPDATE Precios SET cantidad_min=19 WHERE id_precio = 38
 
 -- Actualizar el metro lineal a 5 de laminado para vinilo
 SELECT * FROM OpcionExtra WHERE descripcion = 'Laminado'
