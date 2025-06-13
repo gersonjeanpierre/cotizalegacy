@@ -607,7 +607,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
 
         // Obtener precio unitario del vinil
         $precioUnitario = obtenerPrecioProducto($id_producto, $cantidad, $tipo_cliente);
-        $subtotal = $metro_lineal * $precioUnitario * $cantidad;
+        // $subtotal = $metro_lineal * $precioUnitario * $cantidad;
+        $subtotal = 0;
 
         // Si hay opciones adicionales
         $opciones_seleccionadas = isset($_POST['opciones']) ? $_POST['opciones'] : [];
@@ -625,50 +626,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 /////  F I N A L 
                 ///////// V I N I L    B L A N C O ===
                 case '16': // Vinil Blanco Brillo Chino
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '17': // Vinil Blanco Mate Chino
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '22': // Vinil Blanco Brillo Arclad
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '23': // Vinil Blanco Mate Arclad
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 /////////////////// V I N I L    T R A N S P A R E N T E    
                 case '24': // Vinil Transparente Brillo Chino
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '25': // Vinil Transparente Mate Chino
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '26': // Vinil Transparente Brillo Arclad
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '27': // Vinil Transparente Mate Arclad
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
@@ -677,50 +678,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 /////   I M P R E N T E R O 
                 // V I N I L    B L A N C O ===
                 case '32':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '33':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '34':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '35':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 ///  V I N I L   T R A N S P A R E N T E
                 case '36':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '37':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '38':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 case '39':
-                    $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
@@ -740,8 +741,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                     $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
                     break;
                 case '62':
-                    $ancho_plancha = isset($_POST["ancho_plancha_mop"]) ? floatval($_POST["ancho_plancha_mop"]) : 0;
                     $alto_plancha = isset($_POST["alto_plancha_mop"]) ? floatval($_POST["alto_plancha_mop"]) : 0;
+                    $ancho_plancha = isset($_POST["ancho_plancha_mop"]) ? floatval($_POST["ancho_plancha_mop"]) : 0;
                     // Verifica si Celtex está seleccionado (id 54 o 61)
                     $materialSeleccionado = false;
                     $material_id = null;
@@ -757,17 +758,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                     }
 
 
+                    // if ($ancho_plancha > 0 && $alto_plancha > 0 && $materialSeleccionado) {
+                    //     $precioBaseMaterial = obtenerPrecioOpcion($material_id, $id_producto, $tipo_cliente);
+                    //     $adicional_actual = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
+                    //     $adicional_actual += calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
+                    //     $adicionales += $adicional_actual;
+                    //     $opciones_detalle[] = [
+                    //         'id' => $opcion_id,
+                    //         'ancho_plancha' => $ancho_plancha,
+                    //         'alto_plancha' => $alto_plancha,
+                    //         'area_plancha' => $ancho_plancha * $alto_plancha,
+                    //         'valor' => $adicional_actual
+                    //     ];
+                    // }
                     if ($ancho_plancha > 0 && $alto_plancha > 0 && $materialSeleccionado) {
                         $precioBaseMaterial = obtenerPrecioOpcion($material_id, $id_producto, $tipo_cliente);
-                        $adicional_actual = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
-                        $adicional_actual += calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
-                        $adicionales += $adicional_actual;
+                        $valor_celtexfoam = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
+                        $valor_mano_obra = calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
+
+                        $cantidadPlanchas = number_format($valor_celtexfoam / $precioBaseMaterial,2);
+
+                        $adicionales += $valor_celtexfoam + $valor_mano_obra;
+
+                        // Guarda Celtex/Foam como una opción separada
                         $opciones_detalle[] = [
-                            'id' => $opcion_id,
-                            'ancho_plancha' => $ancho_plancha,
-                            'alto_plancha' => $alto_plancha,
-                            'area_plancha' => $ancho_plancha * $alto_plancha,
-                            'valor' => $adicional_actual
+                            'id' => $material_id,
+                            'tipo' => 'Material',
+                            'cantidad_planchas' => ' (' . $cantidadPlanchas . ' planchas)',
+                            'valor' => $valor_celtexfoam
+                        ];
+                        // Guarda Mano de Obra Pegado como otra opción separada
+                        $opciones_detalle[] = [
+                            'id' => $opcion_id, // id 62 o 63
+                            'tipo' => 'Mano de Obra Pegado',
+                            'valor' => $valor_mano_obra
                         ];
                     }
                     break;
@@ -1430,14 +1454,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                                                     <div id="opcion-${id}_input_container" style="display:none; margin-top:10px;">
                                                         <div class="row">
                                                             <div class="col-md-6">
+                                                            <div class="col-md-6">
+                                                                <label for="alto_plancha_mop" class="form-label">Metro lineal(m):</label>
+                                                                <input type="number" id="alto_plancha_mop" name="alto_plancha_mop" 
+                                                                    class="form-control" step="0.01" min="0.01" ">
+                                                            </div>
                                                                 <label for="ancho_plancha_mop" class="form-label">Ancho plancha (m):</label>
                                                                 <input type="number" id="ancho_plancha_mop" name="ancho_plancha_mop" 
                                                                     class="form-control" step="0.01" min="0.01" max="1.5">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label for="alto_plancha_mop" class="form-label">Alto plancha (m):</label>
-                                                                <input type="number" id="alto_plancha_mop" name="alto_plancha_mop" 
-                                                                    class="form-control" step="0.01" min="0.01" max="2.5">
                                                             </div>
                                                         </div>
                                                         <div class="mt-2">
@@ -1526,6 +1550,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
             return false; // Evitar el envío del formulario
         }
 
+        // function toggleManoObraInput(checkboxId) {
+        //     const checkbox = document.getElementById(checkboxId);
+        //     const container = document.getElementById(checkboxId + '_input_container');
+
+
+        //     if (checkbox.checked) {
+        //         container.style.display = 'block';
+
+        //         // Agregar event listeners para calcular área en tiempo real
+        //         const anchoInput = document.getElementById('ancho_plancha_mop');
+        //         const altoInput = document.getElementById('alto_plancha_mop');
+        //         const areaDisplay = document.getElementById('area_plancha_display');
+        //         const metroLinealInput = document.getElementById('metro_lineal');
+
+        //         function actualizarArea() {
+        //             const ancho = parseFloat(anchoInput.value) || 0;
+        //             const alto = parseFloat(altoInput.value) || 0;
+        //             const area = ancho * alto;
+        //             areaDisplay.textContent = area.toFixed(2);
+        //         }
+
+        //         anchoInput.addEventListener('input', actualizarArea);
+        //         altoInput.addEventListener('input', actualizarArea);
+
+        //     } else {
+        //         container.style.display = 'none';
+        //         // Limpiar valores
+        //         document.getElementById('ancho_plancha_mop').value = '';
+        //         document.getElementById('alto_plancha_mop').value = '';
+        //         document.getElementById('area_plancha_display').textContent = '0.00';
+        //     }
+        // }
         function toggleManoObraInput(checkboxId) {
             const checkbox = document.getElementById(checkboxId);
             const container = document.getElementById(checkboxId + '_input_container');
@@ -1533,27 +1589,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
             if (checkbox.checked) {
                 container.style.display = 'block';
 
-                // Agregar event listeners para calcular área en tiempo real
-                const anchoInput = document.getElementById('ancho_plancha_mop');
-                const altoInput = document.getElementById('alto_plancha_mop');
-                const areaDisplay = document.getElementById('area_plancha_display');
+                // Espera a que el DOM esté listo (por si el HTML es dinámico)
+                setTimeout(() => {
+                    const anchoInput = document.getElementById('ancho_plancha_mop');
+                    const altoInput = document.getElementById('alto_plancha_mop');
+                    const areaDisplay = document.getElementById('area_plancha_display');
+                    const metroLinealInput = document.getElementById('metro_lineal');
 
-                function actualizarArea() {
-                    const ancho = parseFloat(anchoInput.value) || 0;
-                    const alto = parseFloat(altoInput.value) || 0;
-                    const area = ancho * alto;
-                    areaDisplay.textContent = area.toFixed(2);
-                }
+                    function actualizarArea() {
+                        const ancho = parseFloat(anchoInput.value) || 0;
+                        const alto = parseFloat(altoInput.value) || 0;
+                        const area = ancho * alto;
+                        areaDisplay.textContent = area.toFixed(2);
+                    }
 
-                anchoInput.addEventListener('input', actualizarArea);
-                altoInput.addEventListener('input', actualizarArea);
+                    // Copiar el valor de metro_lineal al altoInput al activar el checkbox
+                    if (metroLinealInput && altoInput) {
+                        altoInput.value = metroLinealInput.value;
+                    }
+
+                    // Listeners para recalcular área
+                    if (anchoInput && altoInput && areaDisplay) {
+                        anchoInput.addEventListener('input', actualizarArea);
+                        altoInput.addEventListener('input', actualizarArea);
+                        actualizarArea();
+                    }
+
+                    // Si el usuario cambia metro_lineal después, también actualizar altoInput y área
+                    if (metroLinealInput && altoInput && areaDisplay) {
+                        metroLinealInput.addEventListener('input', function() {
+                            altoInput.value = metroLinealInput.value;
+                            actualizarArea();
+                        });
+                    }
+                }, 10);
 
             } else {
                 container.style.display = 'none';
-                // Limpiar valores
-                document.getElementById('ancho_plancha_mop').value = '';
-                document.getElementById('alto_plancha_mop').value = '';
-                document.getElementById('area_plancha_display').textContent = '0.00';
+                const anchoInput = document.getElementById('ancho_plancha_mop');
+                const altoInput = document.getElementById('alto_plancha_mop');
+                const areaDisplay = document.getElementById('area_plancha_display');
+                if (anchoInput) anchoInput.value = '';
+                if (altoInput) altoInput.value = '';
+                if (areaDisplay) areaDisplay.textContent = '0.00';
             }
         }
     </script>
