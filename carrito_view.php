@@ -52,6 +52,10 @@ if (empty($_SESSION['carrito'])) {
                                 if (isset($opcion['cantidad'])) {
                                     $detalle = " ({$opcion['cantidad']} unidades)";
                                 }
+
+                                if ($opcion['tipo'] == 'Material') {
+                                    $detalle = $opcion['cantidad_planchas'];
+                                }
                                 
                                 // Obtener el nombre de la opción desde la base de datos
                                 global $conn;

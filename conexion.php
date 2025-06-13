@@ -6,11 +6,11 @@
             $dbname='Cotizacion';
             $username='sa';
             // $password='admin123';
-            $password='Admin1234';
+            $password='admin123';
             $puerto=1433;
 
             try{
-                $conexion = new PDO("sqlsrv:Server=$localhost,$puerto;Database=$dbname", $username, $password);
+              $conexion = new PDO("sqlsrv:Server=$localhost,$puerto;Database=$dbname;Encrypt=yes;TrustServerCertificate=yes", $username, $password);
                 $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return $conexion;
             } catch (PDOException $e) {

@@ -1,5 +1,5 @@
 <?php
-include_once("conexion.php");
+require __DIR__ . "/conexion.php";
 
 // Recoge y se envia los datos ingresados
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

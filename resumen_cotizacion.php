@@ -1,5 +1,5 @@
 <?php
-include 'conexion.php';
+require __DIR__ . "/conexion.php";
 $conn = Cconexion::ConexionBD();
 
 function obtenerNombreCliente($id_cliente) {
