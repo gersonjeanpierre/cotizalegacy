@@ -55,4 +55,9 @@ INSERT INTO OpcionExtra VALUES ('Foam 5mm',2,49,'imprentero');
 INSERT INTO OpcionExtra VALUES ('Mano de obra Pagado',2,null,'final');
 INSERT INTO OpcionExtra VALUES ('Mano de obra Pagado',2,null,'imprentero');
 
+ALTER TABLE Cliente
+ADD deletedAt DATETIME DEFAULT NULL;
+
+UPDATE Cliente SET deletedAt = GETDATE() 
+WHERE deletedAt IS NULL
 

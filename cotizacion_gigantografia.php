@@ -59,7 +59,7 @@ function obtenerClientes()
 {
     global $conn;
     $clientes = [];
-    $sql = "SELECT id_cliente, nombre FROM Cliente";
+    $sql = "SELECT id_cliente, nombre FROM Cliente WHERE deletedAt IS NULL";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
@@ -776,7 +776,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                         $valor_celtexfoam = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
                         $valor_mano_obra = calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
 
-                        $cantidadPlanchas = number_format($valor_celtexfoam / $precioBaseMaterial,2);
+                        $cantidadPlanchas = number_format($valor_celtexfoam / $precioBaseMaterial, 2);
 
                         $adicionales += $valor_celtexfoam + $valor_mano_obra;
 
@@ -944,181 +944,228 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         .nav-tabs {
             margin-bottom: 20px;
         }
+        .laser-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px;
+        }
+        .laser {
+            display: flex;
+            justify-content: center;
+            font-style: italic;
+            letter-spacing: -0.05em;
+            gap: 0.25em;
+            width: 9.5em;
+            height: auto;
+            font-size: 2.25em;
+            font-weight: bold;
+            color: #fff;
+            background-color: #ff0000;
+        }
+
+        .laser-color {
+            color: yellow;
+        }
+
+        .laser-veloz {
+            font-weight: bold;
+            background: repeating-linear-gradient(#fff,
+                    #fff 2px,
+                    #ff0000 2px,
+                    #ff0000 3px);
+            background-size: 100% 100%;
+            /* Asegura que el gradiente ocupe todo el texto */
+            -webkit-background-clip: text;
+            /* Aplica el fondo al texto */
+            background-clip: text;
+            /* Estándar */
+            -webkit-text-fill-color: transparent;
+            /* Hace que el texto sea transparente para que se vea el fondo */
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1 class="mb-4">Sistema de Cotización</h1>
-
-        <?php if ($guardado_exitoso): ?>
-            <div class="success-message">
-                <strong>¡Cotización guardada con éxito!</strong> ID de cotización: <?php echo $cotizacion_id; ?>
+        <div class="laser-container">
+            <div class="laser">
+                <span>LASER</span>
+                <span class="laser-color">COLOR</span>
+                <span class="laser-veloz">VELOZ</span>
             </div>
-        <?php endif; ?>
 
-        <?php if (isset($_GET['agregado']) && $_GET['agregado'] == 'true'): ?>
-            <div class="alert alert-success">
-                <i class="bi bi-check-circle-fill"></i> Producto agregado al carrito correctamente.
-            </div>
-        <?php endif; ?>
+        </div>
+        <h2 class="mb-4">Sistema de Cotización</h1>
 
-        <!-- Pestañas para navegar entre "Agregar Productos" y "Ver Carrito" -->
-        <ul class="nav nav-tabs" id="cotizacionTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="productos-tab" data-bs-toggle="tab"
-                    data-bs-target="#productos" type="button" role="tab"
-                    aria-controls="productos" aria-selected="true">
-                    <i class="bi bi-plus-circle"></i> Agregar Productos
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="carrito-tab" data-bs-toggle="tab"
-                    data-bs-target="#carrito" type="button" role="tab"
-                    aria-controls="carrito" aria-selected="false">
-                    <i class="bi bi-cart"></i> Ver Carrito
-                    <span class="badge bg-primary"><?php echo count($_SESSION['carrito']); ?></span>
-                </button>
-            </li>
-        </ul>
+            <?php if ($guardado_exitoso): ?>
+                <div class="success-message">
+                    <strong>¡Cotización guardada con éxito!</strong> ID de cotización: <?php echo $cotizacion_id; ?>
+                </div>
+            <?php endif; ?>
 
-        <div class="tab-content" id="cotizacionTabsContent">
-            <!-- Pestaña de Agregar Productos -->
-            <div class="tab-pane fade show active" id="productos" role="tabpanel" aria-labelledby="productos-tab">
-                <form method="POST" class="mb-4">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="cliente" class="form-label">Seleccione un cliente:</label>
-                            <select id="cliente" name="cliente" class="form-select" required>
-                                <option value="">-- Seleccionar Cliente --</option>
-                                <?php foreach ($clientes as $id => $nombre): ?>
-                                    <option value="<?php echo $id; ?>" <?php echo ($id == $clienteSeleccionado) ? 'selected' : ''; ?>><?php echo $nombre; ?></option>
-                                    <?php $clienteSeleccionado = $_GET['id_cliente'] ?? $_POST['cliente'] ?? $_SESSION['cliente_seleccionado'] ?? ''; ?>
+            <?php if (isset($_GET['agregado']) && $_GET['agregado'] == 'true'): ?>
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i> Producto agregado al carrito correctamente.
+                </div>
+            <?php endif; ?>
+
+            <!-- Pestañas para navegar entre "Agregar Productos" y "Ver Carrito" -->
+            <ul class="nav nav-tabs" id="cotizacionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="productos-tab" data-bs-toggle="tab"
+                        data-bs-target="#productos" type="button" role="tab"
+                        aria-controls="productos" aria-selected="true">
+                        <i class="bi bi-plus-circle"></i> Agregar Productos
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="carrito-tab" data-bs-toggle="tab"
+                        data-bs-target="#carrito" type="button" role="tab"
+                        aria-controls="carrito" aria-selected="false">
+                        <i class="bi bi-cart"></i> Ver Carrito
+                        <span class="badge bg-primary"><?php echo count($_SESSION['carrito']); ?></span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="cotizacionTabsContent">
+                <!-- Pestaña de Agregar Productos -->
+                <div class="tab-pane fade show active" id="productos" role="tabpanel" aria-labelledby="productos-tab">
+                    <form method="POST" class="mb-4">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="cliente" class="form-label">Seleccione un cliente:</label>
+                                <select id="cliente" name="cliente" class="form-select" required>
+                                    <option value="">-- Seleccionar Cliente --</option>
+                                    <?php foreach ($clientes as $id => $nombre): ?>
+                                        <option value="<?php echo $id; ?>" <?php echo ($id == $clienteSeleccionado) ? 'selected' : ''; ?>><?php echo $nombre; ?></option>
+                                        <?php $clienteSeleccionado = $_GET['id_cliente'] ?? $_POST['cliente'] ?? $_SESSION['cliente_seleccionado'] ?? ''; ?>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="mt-2">
+                                    <a href="index.php" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-person-plus"></i> Nuevo Cliente
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="tipo-cliente-selector mt-4">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_final_nuevo" value="final_nuevo" <?php echo ($tipo_cliente == 'final_nuevo' || !$tipo_cliente) ? 'checked' : ''; ?>>
+                                        <label class="form-check-label" for="tipo_final_nuevo">Cliente Final Nuevo</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_final_frecuente" value="final_frecuente" <?php echo ($tipo_cliente == 'final_frecuente') ? 'checked' : ''; ?>>
+                                        <label class="form-check-label" for="tipo_final_frecuente">Cliente Final Frecuente</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_imprentero_nuevo" value="imprentero_nuevo" <?php echo ($tipo_cliente == 'imprentero_nuevo') ? 'checked' : ''; ?>>
+                                        <label class="form-check-label" for="tipo_imprentero_nuevo">Cliente Imprentero Nuevo</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_imprentero_frecuente" value="imprentero_frecuente" <?php echo ($tipo_cliente == 'imprentero_frecuente') ? 'checked' : ''; ?>>
+                                        <label class="form-check-label" for="tipo_imprentero_frecuente">Cliente Imprentero Frecuente</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="producto" class="form-label">Seleccione un producto:</label>
+                            <select id="producto" name="producto" class="form-select" onchange="mostrarFormulario()" required>
+                                <option value="">-- Seleccionar Producto --</option>
+                                <?php foreach ($productos as $id => $nombre): ?>
+                                    <option value="<?php echo $id; ?>" <?php echo ($id == $productoSeleccionado) ? 'selected' : ''; ?>><?php echo $nombre; ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <div class="mt-2">
-                                <a href="index.php" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-person-plus"></i> Nuevo Cliente
-                                </a>
-                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="tipo-cliente-selector mt-4">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_final_nuevo" value="final_nuevo" <?php echo ($tipo_cliente == 'final_nuevo' || !$tipo_cliente) ? 'checked' : ''; ?>>
-                                    <label class="form-check-label" for="tipo_final_nuevo">Cliente Final Nuevo</label>
+
+                        <!-- Formulario para Gigantografía (id=1) -->
+                        <div id="form-1" class="producto-form form-section" style="display:none;">
+                            <h3>Gigantografía</h3>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="ancho" class="form-label">Ancho (m):</label>
+                                    <input type="number" id="ancho" name="ancho" class="form-control" step="0.01" min="0.01" required>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_final_frecuente" value="final_frecuente" <?php echo ($tipo_cliente == 'final_frecuente') ? 'checked' : ''; ?>>
-                                    <label class="form-check-label" for="tipo_final_frecuente">Cliente Final Frecuente</label>
+                                <div class="col-md-4 mb-3">
+                                    <label for="largo" class="form-label">Alto (m):</label>
+                                    <input type="number" id="largo" name="largo" class="form-control" step="0.01" min="0.01" required>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_imprentero_nuevo" value="imprentero_nuevo" <?php echo ($tipo_cliente == 'imprentero_nuevo') ? 'checked' : ''; ?>>
-                                    <label class="form-check-label" for="tipo_imprentero_nuevo">Cliente Imprentero Nuevo</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="tipo_cliente" id="tipo_imprentero_frecuente" value="imprentero_frecuente" <?php echo ($tipo_cliente == 'imprentero_frecuente') ? 'checked' : ''; ?>>
-                                    <label class="form-check-label" for="tipo_imprentero_frecuente">Cliente Imprentero Frecuente</label>
+                                <div class="col-md-4 mb-3">
+                                    <label for="cantidad_gigantografia" class="form-label">Cantidad:</label>
+                                    <input type="number" id="cantidad_gigantografia" name="cantidad_gigantografia" class="form-control" min="1" value="1" required>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="producto" class="form-label">Seleccione un producto:</label>
-                        <select id="producto" name="producto" class="form-select" onchange="mostrarFormulario()" required>
-                            <option value="">-- Seleccionar Producto --</option>
-                            <?php foreach ($productos as $id => $nombre): ?>
-                                <option value="<?php echo $id; ?>" <?php echo ($id == $productoSeleccionado) ? 'selected' : ''; ?>><?php echo $nombre; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Formulario para Gigantografía (id=1) -->
-                    <div id="form-1" class="producto-form form-section" style="display:none;">
-                        <h3>Gigantografía</h3>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="ancho" class="form-label">Ancho (m):</label>
-                                <input type="number" id="ancho" name="ancho" class="form-control" step="0.01" min="0.01" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="largo" class="form-label">Alto (m):</label>
-                                <input type="number" id="largo" name="largo" class="form-control" step="0.01" min="0.01" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="cantidad_gigantografia" class="form-label">Cantidad:</label>
-                                <input type="number" id="cantidad_gigantografia" name="cantidad_gigantografia" class="form-control" min="1" value="1" required>
+                        <!-- Formulario para Vinil (id=2) -->
+                        <div id="form-2" class="producto-form form-section" style="display:none;">
+                            <h3>Vinil</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="metro_lineal" class="form-label">Metro Lineal:</label>
+                                    <input type="number" id="metro_lineal" name="metro_lineal" class="form-control" step="0.1" min="0.1" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cantidad_vinil" class="form-label">Cantidad:</label>
+                                    <input type="number" id="cantidad_vinil" name="cantidad_vinil" class="form-control" min="1" value="1" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Formulario para Vinil (id=2) -->
-                    <div id="form-2" class="producto-form form-section" style="display:none;">
-                        <h3>Vinil</h3>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="metro_lineal" class="form-label">Metro Lineal:</label>
-                                <input type="number" id="metro_lineal" name="metro_lineal" class="form-control" step="0.1" min="0.1" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cantidad_vinil" class="form-label">Cantidad:</label>
-                                <input type="number" id="cantidad_vinil" name="cantidad_vinil" class="form-control" min="1" value="1" required>
+                        <!-- Formulario para Lapicero (id=3) -->
+                        <div id="form-3" class="producto-form form-section" style="display:none;">
+                            <h3>Lapicero</h3>
+                            <div class="mb-3">
+                                <label for="cantidad-lapicero" class="form-label">Cantidad:</label>
+                                <input type="number" id="cantidad-lapicero" name="cantidad" class="form-control" min="1" required>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Formulario para Lapicero (id=3) -->
-                    <div id="form-3" class="producto-form form-section" style="display:none;">
-                        <h3>Lapicero</h3>
-                        <div class="mb-3">
-                            <label for="cantidad-lapicero" class="form-label">Cantidad:</label>
-                            <input type="number" id="cantidad-lapicero" name="cantidad" class="form-control" min="1" required>
+                        <!-- Opciones adicionales -->
+                        <div id="opciones-container" class="opciones-container" style="display:none;">
+                            <h3>Opciones</h3>
+                            <div id="opciones-dinamicas">
+                                <!-- Aquí se cargarán dinámicamente las opciones -->
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Opciones adicionales -->
-                    <div id="opciones-container" class="opciones-container" style="display:none;">
-                        <h3>Opciones</h3>
-                        <div id="opciones-dinamicas">
-                            <!-- Aquí se cargarán dinámicamente las opciones -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="aplicar_igv" name="aplicar_igv" value="1" <?php echo (isset($_POST['aplicar_igv']) && $_POST['aplicar_igv'] == '1') ? 'checked' : ''; ?>>
+                            <label class="form-check-label" for="aplicar_igv">
+                                Aplicar IGV (18%)
+                            </label>
                         </div>
-                    </div>
 
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="aplicar_igv" name="aplicar_igv" value="1" <?php echo (isset($_POST['aplicar_igv']) && $_POST['aplicar_igv'] == '1') ? 'checked' : ''; ?>>
-                        <label class="form-check-label" for="aplicar_igv">
-                            Aplicar IGV (18%)
-                        </label>
-                    </div>
+                        <div class="mt-4">
+                            <button type="submit" name="agregar_al_carrito" class="btn btn-primary">
+                                <i class="bi bi-cart-plus"></i> Agregar al Carrito
+                            </button>
+                            <a href="index.php" class="btn btn-secondary">
+                                <i class="bi bi-house"></i> Inicio
+                            </a>
+                            <a href="resumen_cotizacion.php" class="btn btn-info">
+                                <i class="bi bi-file-earmark-text"></i> Ver Resumen
+                            </a>
+                        </div>
+                    </form>
+                </div>
 
-                    <div class="mt-4">
-                        <button type="submit" name="agregar_al_carrito" class="btn btn-primary">
-                            <i class="bi bi-cart-plus"></i> Agregar al Carrito
-                        </button>
-                        <a href="index.php" class="btn btn-secondary">
-                            <i class="bi bi-house"></i> Inicio
-                        </a>
-                        <a href="resumen_cotizacion.php" class="btn btn-info">
-                            <i class="bi bi-file-earmark-text"></i> Ver Resumen
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Pestaña de Ver Carrito -->
-            <div class="tab-pane fade" id="carrito" role="tabpanel" aria-labelledby="carrito-tab">
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0"><i class="bi bi-cart4"></i> Carrito de Cotización</h3>
-                    </div>
-                    <div class="card-body">
-                        <?php include 'carrito_view.php'; // Incluir vista parcial del carrito 
-                        ?>
+                <!-- Pestaña de Ver Carrito -->
+                <div class="tab-pane fade" id="carrito" role="tabpanel" aria-labelledby="carrito-tab">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h3 class="mb-0"><i class="bi bi-cart4"></i> Carrito de Cotización</h3>
+                        </div>
+                        <div class="card-body">
+                            <?php include 'carrito_view.php'; // Incluir vista parcial del carrito 
+                            ?>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

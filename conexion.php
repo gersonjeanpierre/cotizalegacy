@@ -3,7 +3,7 @@
 
         public static function ConexionBD(){
             $localhost='localhost';
-            $dbname='Cotizacion';
+            $dbname='CotizacionDev';
             $username='sa';
             // $password='admin123';
             $password='admin123';
