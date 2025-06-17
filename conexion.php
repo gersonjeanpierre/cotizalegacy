@@ -5,7 +5,6 @@
             $localhost='localhost';
             $dbname='CotizacionDev';
             $username='sa';
-            // $password='admin123';
             $password='admin123';
             $puerto=1433;
 
