@@ -518,8 +518,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         $precioBase = obtenerPrecioProducto($id_producto, $cantidad, $tipo_cliente);
         // $precioUnitario = obtenerPrecioPorArea($id_producto, $area, $tipo_cliente);
         $tipo_cliente_simple = getTipoClienteBaseDatos($tipo_cliente);
-        
-        $precioUnitario = obtenerPrecioPorAreaNoDB($tipo_cliente_simple,$cantidad);
+
+        $precioUnitario = obtenerPrecioPorAreaNoDB($tipo_cliente_simple, $cantidad);
         // Convertir el tipo de cliente al formato de base de datos para la comparación
 
         // Calcular subtotal con mínimos según tipo de cliente
@@ -531,6 +531,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         //     $subtotal = $precioUnitario * $area;
         // }
         $subtotal = $precioUnitario * $area;
+        $decimal = $subtotal - floor($subtotal);
+        if ($decimal >= 0.5) {
+            $subtotal = ceil($subtotal);
+        } else {
+            $subtotal = floor($subtotal);
+        }
 
         // Calcular adicionales por opciones seleccionadas
         $opciones_seleccionadas = isset($_POST['opciones']) ? $_POST['opciones'] : [];
