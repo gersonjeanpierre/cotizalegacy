@@ -93,6 +93,35 @@ function obtenerPrecioPorArea($id_producto, $area, $tipo_cliente)
     return $precio;
 }
 
+function obtenerPrecioPorAreaNoDB($tipo_cliente, $cantidad)
+{
+    if ($tipo_cliente == 'final') {
+        if ($cantidad <= 6 && $cantidad > 0) {
+            $precio = 17.00;
+        };
+        if ($cantidad > 6 && $cantidad <= 18) {
+            $precio = 15.00;
+        };
+        if ($cantidad > 18 && $cantidad <= 500) {
+            $precio = 13.00;
+        };
+    }
+
+    if ($tipo_cliente == 'imprentero') {
+        if ($cantidad <= 6 && $cantidad > 0) {
+            $precio = 13.00;
+        };
+        if ($cantidad > 6 && $cantidad <= 18) {
+            $precio = 12.00;
+        };
+        if ($cantidad > 18 && $cantidad <= 500) {
+            $precio = 10.00;
+        };
+    }
+
+    return $precio;
+}
+
 function obtenerPrecioProducto($id_producto, $cantidad = 1, $tipo_cliente)
 {
     global $conn;
@@ -327,7 +356,6 @@ function calcularPrecioCeltexFoam(
     }
 
 
-
     // Menor iguala 1,2 metros el metro lineal
     if ($anchoVinilMetros <= $anchoPlancha) {
         if ($anchoVinilMetros <= 0.6) {
@@ -369,17 +397,6 @@ function calcularPrecioCeltexFoam(
         }
 
         if ($largoVinilMetros > 1.2 && $largoVinilMetros <= 1.8) {
-            // $deltaX = $anchoVinilMetros - $anchoPlancha;
-            // $deltaY = $largoPlancha - $largoVinilMetros;
-            // $cantidadListones = $largoVinilMetros / $anchoPlancha;
-            // $cantidadListones = ceil($cantidadListones);
-            // echo "Cantidad de listones necesarios: " . $cantidadListones . PHP_EOL;
-
-            // $areaSobrante = (($deltaY - $cantidadListones * $deltaX) * $anchoPlancha);
-            // $areaSobrante = round($areaSobrante, 4);
-
-            // echo "Area sobrante:" . ($areaSobrante) . PHP_EOL;
-            // echo "Medidas sobrantes de la plancha Celtex: " . round($deltaY - $cantidadListones * $deltaX, 4) . " x " . 1.2 . " m" . PHP_EOL;
             $costoFinal = $precioBasePlancha;
             echo "El costo es 1.2 18: " . number_format($costoFinal, 2) . " soles" . PHP_EOL;
             return $costoFinal;
@@ -491,24 +508,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         $ancho = isset($_POST["ancho"]) ? floatval($_POST["ancho"]) : 0;
         $largo = isset($_POST["largo"]) ? floatval($_POST["largo"]) : 0;
         $cantidad = isset($_POST["cantidad_gigantografia"]) ? intval($_POST["cantidad_gigantografia"]) : 1;
+        if ($ancho < 1) {
+            $ancho = 1;
+        }
         $area1 = $ancho * $largo;
         $area = $area1 * $cantidad;
 
         // Obtener precio base por metro cuadrado
         $precioBase = obtenerPrecioProducto($id_producto, $cantidad, $tipo_cliente);
-        $precioUnitario = obtenerPrecioPorArea($id_producto, $area, $tipo_cliente);
-
-        // Convertir el tipo de cliente al formato de base de datos para la comparación
+        // $precioUnitario = obtenerPrecioPorArea($id_producto, $area, $tipo_cliente);
         $tipo_cliente_simple = getTipoClienteBaseDatos($tipo_cliente);
+        
+        $precioUnitario = obtenerPrecioPorAreaNoDB($tipo_cliente_simple,$cantidad);
+        // Convertir el tipo de cliente al formato de base de datos para la comparación
 
         // Calcular subtotal con mínimos según tipo de cliente
-        if ($area < 1 && $tipo_cliente_simple == 'final') {
-            $subtotal = 15.00; // Valor mínimo fijo para cliente final cuando el área es menor a 1
-        } else if ($area < 1 && $tipo_cliente_simple == 'imprentero') {
-            $subtotal = 13.00; // Valor mínimo fijo para imprentero cuando el área es menor a 1
-        } else {
-            $subtotal = $precioUnitario * $area;
-        }
+        // if ($area < 1 && $tipo_cliente_simple == 'final') {
+        //     $subtotal = 15.00; // Valor mínimo fijo para cliente final cuando el área es menor a 1
+        // } else if ($area < 1 && $tipo_cliente_simple == 'imprentero') {
+        //     $subtotal = 13.00; // Valor mínimo fijo para imprentero cuando el área es menor a 1
+        // } else {
+        //     $subtotal = $precioUnitario * $area;
+        // }
+        $subtotal = $precioUnitario * $area;
 
         // Calcular adicionales por opciones seleccionadas
         $opciones_seleccionadas = isset($_POST['opciones']) ? $_POST['opciones'] : [];
@@ -944,12 +966,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         .nav-tabs {
             margin-bottom: 20px;
         }
+
         .laser-container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 80px;
         }
+
         .laser {
             display: flex;
             justify-content: center;
