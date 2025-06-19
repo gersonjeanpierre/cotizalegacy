@@ -511,6 +511,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         if ($ancho < 1) {
             $ancho = 1;
         }
+        if ($largo < 1) {
+            $largo = 1;
+        }
         $area1 = $ancho * $largo;
         $area = $area1 * $cantidad;
 
@@ -520,16 +523,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         $tipo_cliente_simple = getTipoClienteBaseDatos($tipo_cliente);
 
         $precioUnitario = obtenerPrecioPorAreaNoDB($tipo_cliente_simple, $cantidad);
-        // Convertir el tipo de cliente al formato de base de datos para la comparación
-
-        // Calcular subtotal con mínimos según tipo de cliente
-        // if ($area < 1 && $tipo_cliente_simple == 'final') {
-        //     $subtotal = 15.00; // Valor mínimo fijo para cliente final cuando el área es menor a 1
-        // } else if ($area < 1 && $tipo_cliente_simple == 'imprentero') {
-        //     $subtotal = 13.00; // Valor mínimo fijo para imprentero cuando el área es menor a 1
-        // } else {
-        //     $subtotal = $precioUnitario * $area;
-        // }
         $subtotal = $precioUnitario * $area;
         $decimal = $subtotal - floor($subtotal);
         if ($decimal >= 0.5) {
