@@ -25,7 +25,7 @@ if (empty($_SESSION['carrito'])) {
                         // Mostrar datos adicionales específicos del producto
                         if (isset($item['datos_adicionales']) && is_array($item['datos_adicionales'])) {
                             foreach ($item['datos_adicionales'] as $etiqueta => $valor) {
-                                echo "<p><strong>$etiqueta:</strong> $valor</p>";
+                                echo "<p class='info_carrito'><strong>$etiqueta:</strong> $valor</p>";
                             }
                         }
                         
@@ -79,8 +79,8 @@ if (empty($_SESSION['carrito'])) {
                         ?>
                     </div>
                     <div class="col-md-3 text-end">
-                        <p><strong>Subtotal:</strong> S/ <?php echo number_format($item['subtotal'], 2); ?></p>
-                        <p><strong>Margen:</strong> S/ <?php echo number_format($item['margen'], 2); ?></p>
+                        <!-- <p><strong>Subtotal:</strong> S/ <?php echo number_format($item['subtotal'], 2); ?></p> -->
+                        <!-- <p><strong>Margen:</strong> S/ <?php echo number_format($item['margen'], 2); ?></p> -->
                         <p><strong>Total sin IGV:</strong> S/ <?php echo number_format($item['total_sin_igv'], 2); ?></p>
                         <p><strong>Total con IGV:</strong> S/ <?php echo number_format($item['total_con_igv'], 2); ?></p>
                         <a href="?eliminar_producto=<?php echo $item_id; ?>" class="btn btn-danger btn-sm">

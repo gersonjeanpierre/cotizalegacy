@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotización - {{cotizacion.id_registro}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+</head>
+<style>
+    /* Estilos adicionales para el PDF si son necesarios */
+    body {
+        color: #333;
+    }
+
+    /* Para que Tailwind procese los colores en el PDF */
+    @media print {
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+    .laser {
+        font-family: "Roboto Condensed", sans-serif;
+        display: flex;
+        justify-content: center;
+        font-style: italic;
+        letter-spacing: -0.03em;
+        gap: 0.25em;
+        width: 8.4em;
+        font-size: 2.2em;
+        color: #fff;
+        background-color: #ff0000;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+
+    }
+
+    .laser-color {
+        color: yellow;
+    }
+
+    .laser-veloz {
+        font-weight: 900;
+        
+        background: repeating-linear-gradient(#fff,
+                #fff 3px,
+                #ff0000 1px,
+                #ff0000 4px);
+        background-size: 100% 40%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>
+
+<body class="p-8">
+    <div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-lg p-6">
+        <div class="flex justify-between items-center ">
+            <div> {{fecha_actual_larga}} </div>
+            <div class="flex flex-col justify-center items-center">
+                <div class="laser">
+                    <span>LASER</span>
+                    <span class="laser-color">COLOR</span>
+                    <span class="laser-veloz">VELOZ</span>
+                </div>
+
+                <span class="text-gray-600 text-sm">
+                    EDITORIAL GLOBAL MULTIPRINT E.I.R.L.
+                </span>
+
+            </div>
+        </div>
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">COTIZACIÓN</h1>
+            <p class="text-lg text-gray-600">No. {{cotizacion.id_registro}}</p>
+            <p class="text-gray-500 text-sm mt-1">Fecha de Emisión: {{cotizacion.fecha}}</p>
+            <p class="text-gray-500 text-sm">Fecha de Impresión: {{cotizacion.fecha_actual}}</p>
+            <div class="border-b-2 border-gray-300 my-6"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Datos del Cliente</h2>
+                <p class="text-gray-700 mb-2"><strong class="font-bold">Nombre:</strong> {{cliente.nombre}}</p>
+                <p class="text-gray-700 mb-2"><strong class="font-bold">Razón Social:</strong> {{cliente.razon_social}}
+                </p>
+                <p class="text-gray-700"><strong class="font-bold">RUC:</strong> {{cliente.ruc}}</p>
+            </div>
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Información de Contacto</h2>
+                <p class="text-gray-700 mb-2"><strong class="font-bold">Celular:</strong> {{cliente.celular}}</p>
+                <p class="text-gray-700"><strong class="font-bold">Correo:</strong> {{cliente.correo}}</p>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mb-5">Detalle de Productos/Servicios</h2>
+        <div class="overflow-x-auto mb-10">
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-medium uppercase tracking-wider">Producto</th>
+                        <th class="py-3 px-4 text-left text-sm font-medium uppercase tracking-wider">Cantidad</th>
+                        <th class="py-3 px-4 text-left text-sm font-medium uppercase tracking-wider">Opciones Extras
+                        </th>
+                        <th class="py-3 px-4 text-right text-sm font-medium uppercase tracking-wider">Precio Total (S/)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{detalles_cotizacion}}
+                </tbody>
+                <tfoot>
+                    <tr class="bg-gray-50 border-t border-gray-300">
+                        <th colspan="3" class="py-4 px-4 text-right text-xl font-bold text-gray-900">Total General:</th>
+                        <th class="py-4 px-4 text-right text-2xl font-extrabold text-blue-700">S/ {{total_general}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="text-center text-gray-600 text-sm mt-12">
+            <p>Gracias por su preferencia. Para cualquier consulta, no dude en contactarnos.</p>
+            <p class="mt-2">Empresa XYZ - Dirección de Ejemplo #123 - Ciudad, País</p>
+        </div>
+    </div>
+</body>
+
+</html>

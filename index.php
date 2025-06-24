@@ -1,2 +1,3 @@
 <?php
-require_once __DIR__ . '/registro_clientes.php';
+header("Location: cotizacion_gigantografia.php");
+exit;

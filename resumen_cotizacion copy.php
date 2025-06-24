@@ -97,7 +97,6 @@ $cotizaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $detalles = [];
 $cotizacion_actual = null;
 $cliente_actual = null;
-$tipo_cliente = ''; // Nueva variable para almacenar el tipo de cliente
 
 if (isset($_GET['id'])) {
     $id_registro = intval($_GET['id']);
@@ -119,16 +118,6 @@ if (isset($_GET['id'])) {
             'celular' => $row['celular'],
             'correo' => $row['correo']
         ];
-
-        // Determinar el tipo de cliente basado en la longitud del RUC
-        $ruc = trim($cliente_actual['ruc']);
-        if (strlen($ruc) == 11) {
-            $tipo_cliente = 'empresa';
-        } elseif (strlen($ruc) == 8) {
-            $tipo_cliente = 'persona_natural';
-        } else {
-            $tipo_cliente = 'desconocido'; // En caso de que no cumpla 8 u 11 dígitos
-        }
     }
 
     // Obtener detalles de la cotización
@@ -158,6 +147,8 @@ if (isset($_GET['id'])) {
 }
 
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -200,7 +191,7 @@ if (isset($_GET['id'])) {
                             data-cliente='<?php echo json_encode($cliente_actual); ?>'
                             data-detalles='<?php echo json_encode($detalles); ?>'
                             data-id-registro="<?php echo $cotizacion_actual['id_registro']; ?>"
-                            data-tipo-cliente="<?php echo $tipo_cliente; ?>" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center mr-2 transition duration-300 ease-in-out">
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center mr-2 transition duration-300 ease-in-out">
                         <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
                     </button>
                     <a href="resumen_cotizacion.php?action=delete&id=<?php echo $cotizacion_actual['id_registro']; ?>"
@@ -215,12 +206,8 @@ if (isset($_GET['id'])) {
                 <div>
                     <h3 class="text-xl font-medium text-gray-700 mb-3">Información del Cliente</h3>
                     <p class="text-gray-600"><strong class="font-semibold">Nombre:</strong> <?php echo htmlspecialchars($cliente_actual['nombre']); ?></p>
-                    <?php if ($tipo_cliente === 'empresa'): ?>
-                        <p class="text-gray-600"><strong class="font-semibold">Razón Social:</strong> <?php echo htmlspecialchars($cliente_actual['razon_social']); ?></p>
-                        <p class="text-gray-600"><strong class="font-semibold">RUC:</strong> <?php echo htmlspecialchars($cliente_actual['ruc']); ?></p>
-                    <?php elseif ($tipo_cliente === 'persona_natural'): ?>
-                        <p class="text-gray-600"><strong class="font-semibold">DNI:</strong> <?php echo htmlspecialchars($cliente_actual['ruc']); ?></p>
-                    <?php endif; ?>
+                    <p class="text-gray-600"><strong class="font-semibold">Razón Social:</strong> <?php echo htmlspecialchars($cliente_actual['razon_social']); ?></p>
+                    <p class="text-gray-600"><strong class="font-semibold">RUC:</strong> <?php echo htmlspecialchars($cliente_actual['ruc']); ?></p>
                 </div>
                 <div>
                     <h3 class="text-xl font-medium text-gray-700 mb-3">Información de Contacto</h3>
