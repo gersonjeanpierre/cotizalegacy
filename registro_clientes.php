@@ -15,7 +15,7 @@
             <label>Razón Social:</label>
             <input type="text" name="razon_social" required>
 
-            <label>RUC:</label>
+            <label>RUC(11) o DNI(8):</label>
             <input type="text" name="ruc" required>
 
             <label>Celular:</label>
@@ -29,3 +29,21 @@
     </form>
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rucInput = document.querySelector('input[name="ruc"]');
+    const razonSocialInput = document.querySelector('input[name="razon_social"]');
+    let timeout = null;
+
+    rucInput.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            if (rucInput.value.length === 8) {
+                razonSocialInput.value = 'Persona Natural';
+            } else if (rucInput.value.length === 11) {
+                razonSocialInput.value = '';
+            }
+        }, 2400); // 3 segundos
+    });
+});
+</script>

@@ -523,13 +523,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         $tipo_cliente_simple = getTipoClienteBaseDatos($tipo_cliente);
 
         $precioUnitario = obtenerPrecioPorAreaNoDB($tipo_cliente_simple, $cantidad);
-        $subtotal = $precioUnitario * $area;
-        $decimal = $subtotal - floor($subtotal);
-        if ($decimal >= 0.5) {
-            $subtotal = ceil($subtotal);
-        } else {
-            $subtotal = floor($subtotal);
-        }
+        $factor_ganancia = calcularMargenPorTipoCliente($tipo_cliente) + 1;
+        $precioArea = $precioUnitario * $area * $factor_ganancia;
+
+        $subtotal += $precioArea; // Acumular subtotal
 
         // Calcular adicionales por opciones seleccionadas
         $opciones_seleccionadas = isset($_POST['opciones']) ? $_POST['opciones'] : [];
@@ -549,6 +546,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 case '5': // Termosellado
                 case '12':
                     $adicional_actual = calcularPrecioTermosellado($opcion_id, $ancho, $largo, $tipo_opcion, $cantidad, $tipo_cliente);
+                    $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
@@ -556,6 +554,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 case '6': // Pita y Tubo
                 case '13':
                     $adicional_actual = calcularPrecioPitaYTubo($opcion_id, $ancho, $largo, $tipo_opcion, $cantidad, $tipo_cliente);
+                    $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
@@ -564,6 +563,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 case '14':
                     $cantidad_ojales = isset($_POST["cantidad_ojales"]) ? intval($_POST["cantidad_ojales"]) : 0;
                     $adicional_actual = calcularPrecioOjales($opcion_id, $cantidad_ojales, $tipo_cliente);
+                    $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'cantidad' => $cantidad_ojales, 'valor' => $adicional_actual];
                     break;
@@ -571,6 +571,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                 case '8':
                 case '15': // Marco
                     $adicional_actual = calcularPrecioMarco($opcion_id, $ancho, $largo, $cantidad, $tipo_cliente);
+                    $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'valor' => $adicional_actual];
                     break;
@@ -581,10 +582,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
 
                     if ($tipo_opcion == 'Ancho') {
                         $adicional_actual = 2 * $ancho * $opcion_precio;
+                        $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     } elseif ($tipo_opcion == 'Largo') {
                         $adicional_actual = 2 * $largo * $opcion_precio;
+                        $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     } elseif ($tipo_opcion == 'Ambos') {
                         $adicional_actual = 2 * ($ancho + $largo) * $opcion_precio;
+                        $adicional_actual = $factor_ganancia * $adicional_actual; // Aplicar margen
                     }
 
                     $adicionales += $adicional_actual * $cantidad;
@@ -593,14 +597,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         }
 
         $subtotal += $adicionales;
-        $margen = $subtotal * calcularMargenPorTipoCliente($tipo_cliente);
-        $total_sin_igv = $subtotal + $margen;
+        $total_sin_igv = $subtotal;
         $total_con_igv = $total_sin_igv * 1.18;
+
+        // $subtotal += $adicionales;
+        // $margen = $subtotal * calcularMargenPorTipoCliente($tipo_cliente);
+        // $total_sin_igv = $subtotal + $margen;
+        // $total_con_igv = $total_sin_igv * 1.18;
 
         // Datos adicionales para mostrar
         $datos_adicionales = [
             'Área' => number_format($area, 2) . " m²",
-            'Cantidad' => $cantidad
+            'Cantidad' => $cantidad,
+            'Precio Unitario' => "S/." . number_format($precioUnitario * $factor_ganancia, 2) . " x m²",
+            'Precio Area' => "S/." . number_format($precioArea, 2) . " soles",
         ];
 
         // Agregar al carrito
@@ -630,6 +640,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         $precioUnitario = obtenerPrecioProducto($id_producto, $cantidad, $tipo_cliente);
         // $subtotal = $metro_lineal * $precioUnitario * $cantidad;
         $subtotal = 0;
+        $factor_ganancia = calcularMargenPorTipoCliente($tipo_cliente) + 1;
 
         // Si hay opciones adicionales
         $opciones_seleccionadas = isset($_POST['opciones']) ? $_POST['opciones'] : [];
@@ -640,111 +651,159 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
         $adicionales = 0;
         $opciones_detalle = [];
 
+        // Precio por metro lineal
+        $precio_back = 0;
+        $metro_lineal_imprentero = 0;
+        $metro_lineal_final = 0;
+
         foreach ($opciones_seleccionadas as $opcion_id) {
             $tipo_opcion = isset($_POST["opcion-{$opcion_id}_tipo"]) ? $_POST["opcion-{$opcion_id}_tipo"] : 'No';
 
             switch ($opcion_id) {
                 /////  F I N A L 
                 ///////// V I N I L    B L A N C O ===
-                case '16': // Vinil Blanco Brillo Chino
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                case '17': // Vinil Blanco Mate Chino
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                case '22': // Vinil Blanco Brillo Arclad
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                case '23': // Vinil Blanco Mate Arclad
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                /////////////////// V I N I L    T R A N S P A R E N T E    
-                case '24': // Vinil Transparente Brillo Chino
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                case '25': // Vinil Transparente Mate Chino
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                case '26': // Vinil Transparente Brillo Arclad
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
+                // case '16': // Vinil Blanco Brillo Chino
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad* $factor_ganancia;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio * $factor_ganancia;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '17': // Vinil Blanco Mate Chino
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad * $factor_ganancia;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio * $factor_ganancia;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '22': // Vinil Blanco Brillo Arclad
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '23': // Vinil Blanco Mate Arclad
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // /////////////////// V I N I L    T R A N S P A R E N T E    
+                // case '24': // Vinil Transparente Brillo Chino
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '25': // Vinil Transparente Mate Chino
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '26': // Vinil Transparente Brillo Arclad
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_final = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                case '16':
+                case '17':
+                case '22':
+                case '23':
+                case '24':
+                case '25':
+                case '26':
                 case '27': // Vinil Transparente Mate Arclad
                     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad * $factor_ganancia;
                     $adicionales += $adicional_actual;
+                    $precio_back = $adicional_actual;
+                    $metro_lineal_final = $opcion_precio * $factor_ganancia;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
 
                 /////   I M P R E N T E R O 
                 // V I N I L    B L A N C O ===
+                // case '32':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_imprentero = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '33':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_imprentero = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '34':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_imprentero = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '35':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $metro_lineal_imprentero = $opcion_precio;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // ///  V I N I L   T R A N S P A R E N T E
+                // case '36':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '37':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
+                // case '38':
+                //     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
+                //     $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                //     $adicionales += $adicional_actual;
+                //     $precio_back = $adicional_actual;
+                //     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
+                //     break;
                 case '32':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
                 case '33':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
                 case '34':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
                 case '35':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
-                ///  V I N I L   T R A N S P A R E N T E
                 case '36':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
                 case '37':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
                 case '38':
-                    $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
-                    $adicionales += $adicional_actual;
-                    $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
-                    break;
                 case '39':
                     $opcion_precio = $precioUnitario + obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad *  $factor_ganancia;
                     $adicionales += $adicional_actual;
+                    $precio_back = $adicional_actual;
+                    $metro_lineal_imprentero = $opcion_precio *  $factor_ganancia;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
                     break;
                 // LAMINADO
@@ -778,20 +837,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                         }
                     }
 
-
-                    // if ($ancho_plancha > 0 && $alto_plancha > 0 && $materialSeleccionado) {
-                    //     $precioBaseMaterial = obtenerPrecioOpcion($material_id, $id_producto, $tipo_cliente);
-                    //     $adicional_actual = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
-                    //     $adicional_actual += calcularPrecioManoObraPegado($ancho_plancha, $alto_plancha, $cantidad, $tipo_cliente);
-                    //     $adicionales += $adicional_actual;
-                    //     $opciones_detalle[] = [
-                    //         'id' => $opcion_id,
-                    //         'ancho_plancha' => $ancho_plancha,
-                    //         'alto_plancha' => $alto_plancha,
-                    //         'area_plancha' => $ancho_plancha * $alto_plancha,
-                    //         'valor' => $adicional_actual
-                    //     ];
-                    // }
                     if ($ancho_plancha > 0 && $alto_plancha > 0 && $materialSeleccionado) {
                         $precioBaseMaterial = obtenerPrecioOpcion($material_id, $id_producto, $tipo_cliente);
                         $valor_celtexfoam = calcularPrecioCeltexFoam($alto_plancha, $ancho_plancha, $precioBaseMaterial);
@@ -799,43 +844,56 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
 
                         $cantidadPlanchas = number_format($valor_celtexfoam / $precioBaseMaterial, 2);
 
-                        $adicionales += $valor_celtexfoam + $valor_mano_obra;
+                        $adicionales += ($valor_celtexfoam + $valor_mano_obra) * $factor_ganancia;
 
                         // Guarda Celtex/Foam como una opción separada
                         $opciones_detalle[] = [
                             'id' => $material_id,
                             'tipo' => 'Material',
                             'cantidad_planchas' => ' (' . $cantidadPlanchas . ' planchas)',
-                            'valor' => $valor_celtexfoam
+                            'valor' => $valor_celtexfoam *  $factor_ganancia
                         ];
                         // Guarda Mano de Obra Pegado como otra opción separada
                         $opciones_detalle[] = [
                             'id' => $opcion_id, // id 62 o 63
                             'tipo' => 'Mano de Obra Pegado',
-                            'valor' => $valor_mano_obra
+                            'valor' => $valor_mano_obra *  $factor_ganancia
                         ];
                     }
                     break;
 
                 default:
                     $opcion_precio = obtenerPrecioOpcion($opcion_id, $id_producto, $tipo_cliente);
-                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad;
+                    $adicional_actual = $metro_lineal * $opcion_precio * $cantidad * $factor_ganancia;
                     $adicionales += $adicional_actual;
                     $opciones_detalle[] = ['id' => $opcion_id, 'tipo' => $tipo_opcion, 'valor' => $adicional_actual];
             }
         }
 
         $subtotal += $adicionales;
-        $margen = $subtotal * calcularMargenPorTipoCliente($tipo_cliente);
-        $total_sin_igv = $subtotal + $margen;
+        $total_sin_igv = $subtotal;
         $total_con_igv = $total_sin_igv * 1.18;
+        // $subtotal += $adicionales;
+        // $margen = $subtotal * calcularMargenPorTipoCliente($tipo_cliente);
+        // $total_sin_igv = $subtotal + $margen;
+        // $total_con_igv = $total_sin_igv * 1.18;
 
         // Datos adicionales para mostrar
-        $datos_adicionales = [
-            'Metro Lineal' => number_format($metro_lineal, 2) . " m",
-            'Cantidad' => $cantidad
-        ];
-
+        if ($tipo_cliente == 'imprentero_nuevo'  || $tipo_cliente == 'imprentero_frecuente') {
+            $datos_adicionales = [
+                'Cantidad' => $cantidad,
+                'Precio Metro Lineal' => "S/." . number_format($metro_lineal_imprentero, 2) . " x m",
+                'Metro Lineal' => number_format($metro_lineal, 2) . " m",
+                'Precio Total' => "S/." . number_format($precio_back, 2) . " soles"
+            ];
+        } else {
+            $datos_adicionales = [
+                'Cantidad' => $cantidad,
+                'Precio Metro Lineal' => "S/." . number_format($metro_lineal_final, 2) . " x m",
+                'Metro Lineal' => number_format($metro_lineal, 2) . " m",
+                'Precio Total' => "S/." . number_format($precio_back , 2) . " soles"
+            ];
+        }
         // Agregar al carrito
         $item_data = array_merge($item_data, [
             'metro_lineal' => $metro_lineal,
@@ -1006,6 +1064,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
             -webkit-text-fill-color: transparent;
             /* Hace que el texto sea transparente para que se vea el fondo */
         }
+
+        .info_carrito {
+            margin-bottom: 0.5em;
+        }
     </style>
 </head>
 
@@ -1067,7 +1129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_al_carrito']) 
                                     <?php endforeach; ?>
                                 </select>
                                 <div class="mt-2">
-                                    <a href="index.php" class="btn btn-outline-primary btn-sm">
+                                    <a href="registro_clientes.php" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-person-plus"></i> Nuevo Cliente
                                     </a>
                                 </div>

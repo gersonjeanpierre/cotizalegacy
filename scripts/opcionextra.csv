@@ -1,0 +1,52 @@
+﻿5,Termosellado,1,2.00,final
+6,Pita y Tubo,1,5.00,final
+7,Ojales,1,1.00,final
+8,Marco,1,2.50,final
+12,Termosellado,1,1.00,imprentero
+13,Pita y Tubo,1,2.50,imprentero
+14,Ojales,1,0.50,imprentero
+15,Marco,1,2.50,imprentero
+16,Blanco Brillo Chino,2,0.00,final
+17,Blanco Mate Chino,2,0.00,final
+22,Blanco Brillo Arclad,2,10.00,final
+23,Blanco Mate Arclad,2,10.00,final
+24,Transparente Brillo Chino,2,0.00,final
+25,Transparente Mate Chino,2,0.00,final
+26,Transparente Brillo Arclad,2,10.00,final
+27,Transparente Mate Arclad,2,10.00,final
+28,Laminado,2,5.00,final
+29,Semicorte,2,1.00,final
+30,Celtex,2,4.00,final
+31,Foam,2,5.00,final
+32,Blanco Brillo Chino,2,0.00,imprentero
+33,Blanco Mate Chino,2,0.00,imprentero
+34,Blanco Brillo Arclad,2,5.00,imprentero
+35,Blanco Mate Arclad,2,5.00,imprentero
+36,Transparente Brillo Chino,2,0.00,imprentero
+37,Transparente Mate Chino,2,0.00,imprentero
+38,Transparente Brillo Arclad,2,5.00,imprentero
+39,Transparente Mate Arclad,2,5.00,imprentero
+40,Laminado,2,5.00,imprentero
+41,Semicorte,2,0.50,imprentero
+42,Celtex,2,3.00,imprentero
+43,Foam,2,4.00,imprentero
+44,Mano de Obra Pegado,2,NULL,final
+45,Mano de Obra Pegado,2,NULL,imprentero
+46,Laminado Mate Chino,2,5.00,final
+47,Laminado Brillo Chino,2,5.00,final
+48,Laminado Mate Chino,2,5.00,imprentero
+49,Laminado Brillo Chino,2,5.00,imprentero
+50,Laminado Mate Arclad,2,10.00,final
+51,Laminado Brillo Arclad,2,10.00,final
+52,Laminado Mate Arclad,2,10.00,imprentero
+53,Laminado Brillo Arclad,2,10.00,imprentero
+54,Celtex 3mm,2,37.00,final
+55,Celtex 5mm,2,50.00,final
+56,Celtex 3mm,2,37.00,imprentero
+57,Celtex 5mm,2,50.00,imprentero
+58,Foam 3mm,2,34.00,final
+59,Foam 5mm,2,49.00,final
+60,Foam 3mm,2,34.00,imprentero
+61,Foam 5mm,2,49.00,imprentero
+62,Mano de obra Pagado,2,NULL,final
+63,Mano de obra Pagado,2,NULL,imprentero
